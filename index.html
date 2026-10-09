@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Extractor Facebook HAR + IA v4.0</title>
+<link rel="stylesheet" href="styles.css">
+<script defer src="identity.js"></script><script defer src="core.js"></script><script defer src="statistics.js"></script><script defer src="xlsx.js"></script>
+<script defer src="facebook-data.js"></script><script defer src="har-legacy.js"></script><script defer src="har-extractor.js"></script>
+<script defer src="archive-store.js"></script><script defer src="archive-csv.js"></script><script defer src="report-ai.js"></script><script defer src="report.js"></script>
+<script defer src="ai-transport.js"></script><script defer src="ai.js"></script><script defer src="ai-client.js"></script><script defer src="gemini.js"></script><script defer src="excel.js"></script><script defer src="app.js"></script>
+</head>
+<body>
+<header><h1>Extractor Facebook HAR + IA <small>v4.0</small></h1><p>Herramienta de respaldo · misma clasificación y Excel que la extensión v1.29</p></header>
+<main>
+<div class="grid">
+<section class="card"><h2><span class="step">1</span>Preparar publicaciones</h2>
+<label for="harFile">Uno o varios HAR de Facebook</label><input id="harFile" type="file" accept=".har,application/json" multiple>
+<div class="btns"><button id="extractBtn" class="primary">Analizar HAR</button><button id="savedBtn">Abrir guardadas</button></div>
+<label for="account">Cuenta de la dependencia</label><select id="account"><option value="">Carga primero un HAR</option></select>
+<label for="ownAccount">Nombre de la dependencia para el reporte</label><input id="ownAccount" type="text" placeholder="Se identifica al cargar el HAR">
+<label for="description">Descripción o función de la dependencia (opcional)</label><input id="description" type="text" placeholder="Ayuda a contextualizar las actividades propias">
+<div class="row"><div><label for="startDate">Fecha inicial (opcional)</label><input id="startDate" type="date"></div><div><label for="endDate">Fecha final (opcional)</label><input id="endDate" type="date"></div></div>
+<label for="maxPosts">Máximo de publicaciones</label><input id="maxPosts" type="number" min="1" max="5000" value="5000">
+<label class="check"><input id="includeSaved" type="checkbox" checked> Incluir guardadas de esta cuenta en el periodo</label>
+<div class="btns"><button id="applyBtn">Aplicar cuenta y periodo</button></div>
+<div id="extractStatus" class="status" role="status">Carga el HAR generado por la extensión o exportado desde Chrome. Las fechas se aplican en horario de Puebla.</div>
+<div class="notice privacy">El HAR se procesa en tu navegador. Se guarda cada publicación por cuenta y se eliminan duplicados; el archivo HAR completo no se conserva en la aplicación.</div>
+<details><summary>Respaldos y correcciones</summary><label for="restoreFile">Restaurar respaldo JSON de Facebook de la extensión o de este extractor</label><input id="restoreFile" type="file" accept=".json,application/json"><label for="correctionsFile">Importar Publicaciones corregidas en CSV</label><input id="correctionsFile" type="file" accept=".csv,text/csv"><p class="tiny">Las correcciones se vinculan por Enlace. Los registros de esta aplicación y los de la extensión se transfieren mediante el respaldo JSON.</p></details>
+</section>
+<section class="card"><h2><span class="step">2</span>Identificar con Gemini</h2>
+<label for="apiKey">API key de Gemini</label><input id="apiKey" type="password" autocomplete="off" placeholder="Tu clave de Google AI Studio">
+<p class="tiny">Modelo: <b>gemini-3.5-flash-lite</b>. Mismos criterios de la extensión: formato, pertenencia y tema se analizan por separado.</p>
+<div class="row"><div><label for="concurrency">Lotes simultáneos</label><select id="concurrency"><option value="1">1</option><option value="2" selected>2 · recomendado</option><option value="3">3</option></select></div><div><label for="rpm">Máximo de solicitudes por minuto</label><input id="rpm" type="number" min="1" max="120" value="10"></div></div>
+<label class="check"><input id="forceAI" type="checkbox"> Reanalizar resultados IA guardados</label>
+<details><summary>Identificadores y criterios opcionales</summary>
+<p class="tiny">Se incluyen automáticamente las cuentas y etiquetas de Puebla y el contexto de la dependencia. Puedes agregar referencias.</p>
+<label for="governorHandles">Cuentas adicionales del gobernador</label><input id="governorHandles" type="text" placeholder="@armentapuebla_">
+<label for="governmentHandles">Cuentas adicionales del gobierno</label><input id="governmentHandles" type="text" placeholder="@Gob_Puebla">
+<label for="governorHashtags">Etiquetas adicionales del gobernador</label><input id="governorHashtags" type="text" placeholder="#ArmentaContigo">
+<label for="governmentHashtags">Etiquetas adicionales del gobierno</label><input id="governmentHashtags" type="text" placeholder="#PensarEnGrande">
+<label for="extraCriteria">Criterio adicional (opcional)</label><textarea id="extraCriteria" maxlength="4000" placeholder="Solo para precisar casos particulares de la dependencia"></textarea>
+</details>
+<div class="btns"><button id="classifyBtn" class="success" disabled>Clasificar con IA</button><button id="finishBtn" hidden>Terminar y descargar Excel</button></div>
+<div id="aiStatus" class="status" role="status">Cada lote de cinco publicaciones se guarda. Puedes exportar con reglas locales aunque no uses IA.</div>
+<div class="notice">Gemini recibe el texto y las imágenes accesibles de las publicaciones. La clave no se guarda ni se exporta. Si una imagen no se puede descargar o falta evidencia, se marca para revisión. El texto puede ayudar con el tema; distinguir fotografía de infografía requiere evidencia visual.</div>
+</section>
+</div>
+<div class="metrics"><div class="metric"><div class="k">PUBLICACIONES</div><div id="mTotal" class="v">0</div></div><div class="metric propia"><div class="k">PROPIAS</div><div id="mOwn" class="v">0</div></div><div class="metric gob"><div class="k">GOBIERNO DEL ESTADO</div><div id="mGov" class="v">0</div></div><div class="metric govr"><div class="k">GOBERNADOR</div><div id="mGovernor" class="v">0</div></div><div class="metric"><div class="k">POR REVISAR</div><div id="mReview" class="v">0</div></div></div>
+<section class="card table-card"><div class="table-head"><div><b>Publicaciones del reporte</b><div class="tiny">Formato y pertenencia tienen listas cerradas; tema es editable. Los cambios se guardan automáticamente.</div></div><div class="btns" style="margin:0"><button id="xlsxBtn" class="primary" disabled>Descargar Excel</button><button id="csvBtn" disabled>CSV</button><button id="backupBtn" disabled>Respaldo JSON</button></div></div>
+<div class="table-wrap"><table><thead><tr><th>Fecha y hora</th><th>Formato</th><th>Pertenencia</th><th>Tema o proyecto</th><th>Revisión</th><th>Publicación</th><th>Motivos de clasificación</th><th>Cuenta / métricas</th><th>Enlace</th></tr></thead><tbody id="tbody"></tbody></table></div>
+<div class="table-head"><span id="page">Página 1/1</span><div><button id="previous">Anterior</button> <button id="next">Siguiente</button></div></div></section>
+<section class="card table-card monthly"><div class="table-head"><div><b>Estadísticas del reporte</b><p id="formats" class="tiny"></p><div class="tiny">El Excel incluye Publicaciones y Estadísticas, con conteos, porcentajes y fórmulas que se actualizan al corregir las filas existentes.</div></div></div><div class="table-wrap"><table><thead><tr><th>Mes</th><th>Propias</th><th>Gobierno del Estado</th><th>Gobernador</th><th>Total</th></tr></thead><tbody id="monthlyBody"></tbody></table></div></section>
+<p class="tiny">Esta herramienta trabaja con los HAR disponibles; no realiza el recorrido de Facebook. La cobertura depende de las publicaciones capturadas. La captura directa sigue correspondiendo a la extensión.</p>
+</main>
+</body></html>

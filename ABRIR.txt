@@ -1,0 +1,13 @@
+EXTRACTOR FACEBOOK HAR + IA — v4.0
+
+1. Descomprime todos los archivos y abre index.html en Chrome.
+2. Carga el HAR y pulsa Analizar HAR.
+3. Comprueba cuenta, nombre de dependencia y fechas. Si cambias algo, pulsa Aplicar cuenta y periodo.
+4. Ingresa tu API key y pulsa Clasificar con IA. Sin clave también puedes exportar con reglas locales.
+5. Corrige formato, pertenencia o tema en la tabla. Descarga Excel.
+
+El Excel usa exactamente el generador de la extensión v1.29: Publicaciones y Estadísticas.
+Para conservar o transferir los registros, descarga Respaldo JSON. Puedes restaurar los respaldos de Facebook de la extensión.
+Mantén esta página abierta mientras trabaja. Terminar y descargar Excel permite interrumpir la IA y entregar lo disponible.
+
+Si ya utilizas GitHub Pages, sustituye los archivos del sitio por los de este paquete. No necesita Node ni Python para funcionar, y Excel no depende de una descarga desde un CDN. Internet es necesario para Gemini y las imágenes remotas.

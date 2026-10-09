@@ -1,0 +1,8 @@
+(function(global){
+'use strict';
+const HEADERS=['Fecha y hora','Bloque operativo','Texto de la publicación','Tipo de publicación','Pertenencia','Tema o proyecto','Red social','Autor','Enlace','Revisión','Motivo de pertenencia','Origen de fecha','Motivo de formato'];
+function download(blob,name){const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),30000);}
+function csvCell(value){let s=String(value??'');if(/^[=+@-]/.test(s.trimStart()))s="'"+s;return '"'+s.replace(/"/g,'""')+'"';}
+function csv(data){const posts=global.ExtractorStatistics.prepare(data.posts,data.metadata);const rows=[HEADERS,...posts.map(p=>[p.dateTime,p.block,p.fullText||p.text,p.format,p.belonging,p.topic,p.platform,p.author,p.url,p.needsReview?'Revisar':'',p.belongingReason||p.reasoning,p.dateSource,p.formatReason||p.reasoning])];return '\uFEFF'+rows.map(r=>r.map(csvCell).join(',')).join('\r\n');}
+global.FBExport=Object.freeze({download,csv,async exportXlsx(data){download(await global.ExtractorXXlsx.buildWorkbook(data),global.ExtractorXXlsx.exportName(data.metadata));},exportCsv(data){download(new Blob([csv(data)],{type:'text/csv;charset=utf-8'}),global.ExtractorXXlsx.exportName(data.metadata).replace(/\.xlsx$/,'.csv'));},exportBackup(data){download(new Blob([JSON.stringify({metadata:data.metadata,summary:global.ExtractorXCore.buildSummary(data.posts),posts:data.posts},null,2)],{type:'application/json'}),`datos_facebook_${data.metadata.handle}_${data.metadata.from}_${data.metadata.to}.json`);}});
+})(globalThis);
